@@ -322,6 +322,6 @@ def count_sr(argv):
             counts['name'] = record.id
             counts['coord'] = coord
 
-            for row in counts[header].as_matrix():
+            for row in counts[header].values:
                 fout.write('\t'.join([str(x) for x in row]) + '\n')
             #  counts[header].to_csv(fout, header=False, index=False, sep='\t', na_rep='NA')

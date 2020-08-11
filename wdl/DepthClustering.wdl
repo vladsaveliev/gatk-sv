@@ -128,12 +128,12 @@ task MakeRDTestBed {
   command <<<
 
     set -euo pipefail
-    cat \
-      <(python3 /opt/sv-pipeline/scripts/make_depth_rdtest_bed.py ~{dels} | sed '1d') \
-      <(python3 /opt/sv-pipeline/scripts/make_depth_rdtest_bed.py ~{dups} | sed '1d') \
+    python3 /opt/sv-pipeline/scripts/make_depth_rdtest_bed.py ~{dels} | sed '1d' > dels.bed
+    python3 /opt/sv-pipeline/scripts/make_depth_rdtest_bed.py ~{dups} | sed '1d' > dups.bed
+    cat dels.bed dups.bed \
       | sort -k1,1V -k2,2n \
       | cat <(echo -e "#chrom start end name samples svtype" | sed -e 's/ /\t/g') - \
-      > ~{batch}.depth.bed;
+      > ~{batch}.depth.bed
   
   >>>
   runtime {
