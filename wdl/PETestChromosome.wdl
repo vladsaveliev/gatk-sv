@@ -106,16 +106,34 @@ workflow PETestChromosome {
           sv_pipeline_docker = sv_pipeline_docker,
           runtime_attr_override = runtime_attr_petest
       }
-      call tasks02.SplitCommonVCF as SplitCommonVCF {
-        input:
-          vcf = split,
-          cnv_size_cutoff = common_cnv_size_cutoff,
-          sv_pipeline_docker = sv_pipeline_docker,
-          runtime_attr_override = runtime_attr_split_vcf
-      }
+    }
+  }
+
+  if (!allosome) {
+    call tasks02.GetCommonVCF {
+      input:
+        vcf = vcf,
+        cnv_size_cutoff = common_cnv_size_cutoff,
+        sv_pipeline_docker = sv_pipeline_docker,
+        runtime_attr_override = runtime_attr_split_vcf
+    }
+
+    call tasks02.SplitVCF as SplitCommonVCF {
+      input:
+        vcf = GetCommonVCF.common_vcf,
+        batch = batch,
+        algorithm = algorithm,
+        chrom = chrom,
+        split_size = split_size,
+        suffix_len = select_first([suffix_len, 4]),
+        sv_base_mini_docker = sv_base_mini_docker,
+        runtime_attr_override = runtime_attr_split_vcf
+    }
+
+    scatter (split in SplitCommonVCF.split_vcfs) {
       call PETest as PETestAutosomeCommon {
         input:
-          vcf = SplitCommonVCF.common_vcf,
+          vcf = split,
           discfile = discfile,
           medianfile = medianfile,
           discfile_idx = discfile_idx,
@@ -130,7 +148,7 @@ workflow PETestChromosome {
   }
 
   Array[File] unmerged_stats = if allosome then select_all(MergeAllosomes.merged_test) else select_all(PETestAutosome.stats)
-  Array[File] unmerged_stats_common = if allosome then [] else select_all(PETestAutosomeCommon.stats)
+  Array[File] unmerged_stats_common = select_first([PETestAutosomeCommon.stats, []])
 
   call tasks02.MergeStats as MergeStats {
     input:

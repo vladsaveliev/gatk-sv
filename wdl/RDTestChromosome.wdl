@@ -177,7 +177,7 @@ task RDTest {
     java -Xmx~{java_mem_mb}M -jar ${GATK_JAR} PrintSVEvidence \
       --sequence-dictionary ~{ref_dict} \
       --evidence-file ~{coveragefile} \
-      -L ${chrom}:${start}-${end} \
+      -L "${chrom}:${start}-${end}" \
       -O local.RD.txt.gz
 
     tabix -p bed local.RD.txt.gz

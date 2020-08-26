@@ -108,35 +108,49 @@ workflow SRTestChromosome {
           sv_pipeline_docker = sv_pipeline_docker,
           runtime_attr_override = runtime_attr_srtest
       }
+    }
+  }
 
-      if (run_common) {
-        call tasks02.SplitCommonVCF as SplitCommonVCF {
-          input:
-            vcf = split,
-            cnv_size_cutoff = select_first([common_cnv_size_cutoff]),
-            sv_pipeline_docker = sv_pipeline_docker,
-            runtime_attr_override = runtime_attr_split_vcf
-        }
+  if (run_common && !allosome) {
+    call tasks02.GetCommonVCF {
+      input:
+        vcf = vcf,
+        cnv_size_cutoff = select_first([common_cnv_size_cutoff]),
+        sv_pipeline_docker = sv_pipeline_docker,
+        runtime_attr_override = runtime_attr_split_vcf
+    }
 
-        call SRTest as SRTestAutosomeCommon {
-          input:
-            vcf = SplitCommonVCF.common_vcf,
-            splitfile = splitfile,
-            medianfile = medianfile,
-            splitfile_idx = splitfile_idx,
-            whitelist = samples,
-            common_model = true,
-            prefix = basename(split),
-            ref_dict = ref_dict,
-            sv_pipeline_docker = sv_pipeline_docker,
-            runtime_attr_override = runtime_attr_srtest
-        }
+    call tasks02.SplitVCF as SplitCommonVCF {
+      input:
+        vcf = GetCommonVCF.common_vcf,
+        batch = batch,
+        algorithm = algorithm,
+        chrom = chrom,
+        split_size = split_size,
+        suffix_len = select_first([suffix_len, 4]),
+        sv_base_mini_docker = sv_base_mini_docker,
+        runtime_attr_override = runtime_attr_split_vcf
+    }
+
+    scatter (split in SplitCommonVCF.split_vcfs) {
+      call SRTest as SRTestAutosomeCommon {
+        input:
+          vcf = split,
+          splitfile = splitfile,
+          medianfile = medianfile,
+          splitfile_idx = splitfile_idx,
+          whitelist = samples,
+          common_model = true,
+          prefix = basename(split),
+          ref_dict = ref_dict,
+          sv_pipeline_docker = sv_pipeline_docker,
+          runtime_attr_override = runtime_attr_srtest
       }
     }
   }
   
   Array[File] unmerged_stats = if allosome then select_all(MergeAllosomes.merged_test) else select_all(SRTestAutosome.stats)
-  Array[File] unmerged_stats_common = if allosome then [] else select_all(SRTestAutosomeCommon.stats)
+  Array[File] unmerged_stats_common = select_first([SRTestAutosomeCommon.stats, []])
 
   call tasks02.MergeStats as MergeStats {
     input:

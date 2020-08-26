@@ -218,7 +218,7 @@ workflow Module02 {
           runtime_attr_override = runtime_attr_aggregate_tests
       }
 
-      call tasks02.SplitCommonVCF as SplitCommonVCF {
+      call tasks02.GetCommonVCF {
         input:
           vcf = vcf,
           cnv_size_cutoff = common_cnv_size_cutoff,
@@ -228,7 +228,7 @@ workflow Module02 {
 
       call AggregateTests as AggregateTestsCommon {
         input:
-          vcf = SplitCommonVCF.common_vcf,
+          vcf = GetCommonVCF.common_vcf,
           petest = PETest.petest_common,
           srtest = SRTest.srtest_common,
           segdups = segdups,

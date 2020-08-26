@@ -60,7 +60,7 @@ task SplitVCF {
   }
 }
 
-task SplitCommonVCF {
+task GetCommonVCF {
   input{
       File vcf
       Int cnv_size_cutoff
