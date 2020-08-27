@@ -68,7 +68,7 @@ task MakeBincovMatrix {
 
   RuntimeAttr default_attr = object {
     cpu_cores: 1, 
-    mem_gb: 3.75, 
+    mem_gb: 15,
     disk_gb: disk_gb,
     boot_disk_gb: 20,
     preemptible_tries: 0,
@@ -82,7 +82,7 @@ task MakeBincovMatrix {
   }
   command <<<
 
-    set -eu
+    set -u
 
     # make the CollectReadCounts output consistent with the old bincov code
     # determine what format this is
@@ -136,7 +136,7 @@ task MakeBincovMatrix {
         echo $fil has different intervals than ~{all_count_files[0]}
         exit 1
       fi
-      cut -f4- fil.bincov.bed > cargo/`printf "%08d" $fileNo`
+      cut -f4- file.bincov.bed > cargo/`printf "%08d" $fileNo`
       ((++fileNo))
     done
 
