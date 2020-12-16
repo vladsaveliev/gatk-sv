@@ -23,7 +23,6 @@ workflow Module0506ComplexGenotype {
 
     File bin_exclude
     File contig_list
-    Int max_shards_per_chrom
     File ref_dict
 
     String linux_docker
@@ -111,7 +110,7 @@ workflow Module0506ComplexGenotype {
       input:
         vcfs=ScatterCpxGenotyping.cpx_depth_gt_resolved_vcf,
         vcfs_idx=ScatterCpxGenotyping.cpx_depth_gt_resolved_vcf_idx,
-        merge_sort=true,
+        naive=true,
         outfile_prefix="~{cohort_name}.0506_complex",
         sv_base_mini_docker=sv_base_mini_docker,
         runtime_attr_override=runtime_override_concat
