@@ -238,18 +238,18 @@ task ShardVcfCpx {
 
   command <<<
     set -euo pipefail
-    bcftools view -G ~{vcf} -Oz -o sites_only.vcf
-    #Run clustering
-    svtk vcfcluster <(echo "sites_only.vcf")  ~{prefix}.vcf.gz \
-      -d ~{dist} \
-      -f ~{frac} \
-      -p candidate_complex_clusters \
-      --svtypes DEL,DUP,INS,INV,BND \
-      --ignore-svtypes \
-      -o 0 \
-      --preserve-header \
-      --preserve-ids \
-      --skip-merge
+    bcftools view -G ~{vcf} -Oz -o sites_only.vcf.gz
+    svtk vcfcluster <(echo "sites_only.vcf.gz") ~{prefix}.vcf \
+    -d ~{dist} \
+    -f ~{frac} \
+    -p candidate_complex_clusters \
+    --svtypes DEL,DUP,INS,INV,BND \
+    --ignore-svtypes \
+    -o 0 \
+    --preserve-header \
+    --preserve-ids \
+    --skip-merge
+    bgzip ~{prefix}.vcf
   >>>
 
   output {
