@@ -244,6 +244,7 @@ task ShardVcfCpx {
       -d ~{dist} \
       -f ~{frac} \
       -p candidate_complex_clusters \
+      --svtypes DEL,DUP,INS,INV,BND \
       --ignore-svtypes \
       -o 0 \
       --preserve-header \
