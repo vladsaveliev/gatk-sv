@@ -25,6 +25,9 @@ workflow VcfClusterSingleChrom {
     File background_fail
     File empty_file
 
+    File hail_script
+    String project
+
     String sv_pipeline_docker
     String sv_base_mini_docker
 
@@ -114,6 +117,8 @@ workflow VcfClusterSingleChrom {
       exclude_list=exclude_list,
       sv_size=sv_size,
       sv_types=sv_types,
+      hail_script=hail_script,
+      project=project,
       sv_pipeline_docker=sv_pipeline_docker,
       sv_base_mini_docker=sv_base_mini_docker,
       runtime_override_subset_sv_type=runtime_override_subset_sv_type,

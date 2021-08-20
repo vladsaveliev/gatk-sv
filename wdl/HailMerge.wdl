@@ -4,6 +4,7 @@ workflow HailMerge {
   input {
     Array[File] vcfs
     File hail_script
+    String prefix
     String project
   }
 
@@ -11,17 +12,20 @@ workflow HailMerge {
     input:
       vcfs = vcfs,
       hail_script = hail_script,
+      prefix = prefix,
       project = project
   }
 
   output {
     File merged_vcf = HailMerge.merged_vcf
+    File merged_vcf_index = HailMerge.merged_vcf_index
   }
 }
 
 task HailMerge {
   input {
     Array[File] vcfs
+    String prefix
     String project
     File hail_script
     String region = "us-central1"
@@ -35,12 +39,10 @@ task HailMerge {
 
   String cluster_name_prefix="gatk-sv-cluster-"
 
-  File input_vcf_file = write_lines(vcfs)
-
   command <<<
     set -eu    
 
-    cp ~{input_vcf_file} "files.list"
+    cp ~{write_lines(vcfs)} "files.list"
 
     python <<CODE
 import hail as hl
@@ -71,7 +73,8 @@ finally:
   os.popen("gcloud dataproc clusters delete --project {} --region {} {}".format("~{project}", "~{region}", cluster_name)).read()
 CODE
 
-  tabix -p vcf merged.vcf.bgz
+  mv merged.vcf.bgz ~{prefix}.vcf.gz
+  tabix -p vcf ~{prefix}.vcf.gz
   >>>
 
   runtime {
@@ -82,7 +85,7 @@ CODE
   }
 
   output {
-    File merged_vcf = "merged.vcf.bgz"
-    File merged_vcf_index = "merged.vcf.bgz.tbi"
+    File merged_vcf = "~{prefix}.vcf.gz"
+    File merged_vcf_index = "~{prefix}.vcf.gz.tbi"
   }
 }

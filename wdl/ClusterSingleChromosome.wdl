@@ -4,6 +4,7 @@ version 1.0
 
 import "TasksMakeCohortVcf.wdl" as MiniTasks
 import "ShardedCluster.wdl" as ShardedCluster
+import "HailMerge.wdl" as HailMerge
 
 # Workflow to perform sharding & clustering of a vcf for a single chromosome
 workflow ClusterSingleChrom {
@@ -18,6 +19,9 @@ workflow ClusterSingleChrom {
     File? exclude_list
     Int sv_size
     Array[String] sv_types
+
+    File hail_script
+    String project
 
     String sv_pipeline_docker
     String sv_base_mini_docker
@@ -65,6 +69,8 @@ workflow ClusterSingleChrom {
         exclude_list=exclude_list,
         sv_size=sv_size,
         sv_types=sv_types,
+        hail_script=hail_script,
+        project=project,
         sv_pipeline_docker=sv_pipeline_docker,
         sv_base_mini_docker=sv_base_mini_docker,
         runtime_override_shard_vcf_precluster=runtime_override_shard_vcf_precluster,
@@ -85,20 +91,18 @@ workflow ClusterSingleChrom {
   }
 
   #Merge svtypes
-  call MiniTasks.ConcatVcfs as ConcatSvTypes {
+  call HailMerge.HailMerge as ConcatSvTypes {
     input:
       vcfs=RenameVariants.out,
-      vcfs_idx=RenameVariants.out_index,
-      allow_overlaps=true,
-      outfile_prefix="~{prefix}.~{contig}.precluster_concat",
-      sv_base_mini_docker=sv_base_mini_docker,
-      runtime_attr_override=runtime_override_concat_svtypes
+      prefix="~{prefix}.~{contig}.concat_svtypes",
+      hail_script=hail_script,
+      project=project
   }
 
   #Output clustered vcf
   output {
-    File clustered_vcf = ConcatSvTypes.concat_vcf
-    File clustered_vcf_idx = ConcatSvTypes.concat_vcf_idx
+    File clustered_vcf = ConcatSvTypes.merged_vcf
+    File clustered_vcf_idx = ConcatSvTypes.merged_vcf_index
   }
 }
 

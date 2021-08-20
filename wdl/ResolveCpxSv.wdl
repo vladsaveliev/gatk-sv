@@ -3,6 +3,7 @@ version 1.0
 # Author: Ryan Collins <rlcollins@g.harvard.edu>
 
 import "TasksMakeCohortVcf.wdl" as MiniTasks
+import "HailMerge.wdl" as HailMerge
 
 #Resolve complex SV for a single chromosome
 workflow ResolveComplexSv {
@@ -21,6 +22,9 @@ workflow ResolveComplexSv {
 
     Int precluster_distance
     Float precluster_overlap_frac
+
+    File hail_script
+    String project
 
     String sv_pipeline_docker
     String sv_base_mini_docker
@@ -135,20 +139,18 @@ workflow ResolveComplexSv {
     }
 
     #Merge across shards
-    call MiniTasks.ConcatVcfs as ConcatResolvedPerShard {
+    call HailMerge.HailMerge as ConcatResolvedPerShard {
       input:
         vcfs=RestoreUnresolvedCnvPerShard.res,
-        vcfs_idx=RestoreUnresolvedCnvPerShard.res_idx,
-        allow_overlaps=true,
-        outfile_prefix=prefix + ".resolved",
-        sv_base_mini_docker=sv_base_mini_docker,
-        runtime_attr_override=runtime_override_concat_resolved_per_shard
+        prefix="~{prefix}.resolved",
+        hail_script=hail_script,
+        project=project
     }
   }
 
   output {
-    File resolved_vcf_merged = select_first([ConcatResolvedPerShard.concat_vcf, vcf])
-    File resolved_vcf_merged_idx = select_first([ConcatResolvedPerShard.concat_vcf_idx, vcf_idx])
+    File resolved_vcf_merged = select_first([ConcatResolvedPerShard.merged_vcf, vcf])
+    File resolved_vcf_merged_idx = select_first([ConcatResolvedPerShard.merged_vcf_index, vcf_idx])
   }
 }
 

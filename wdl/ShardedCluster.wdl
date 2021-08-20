@@ -4,6 +4,7 @@ version 1.0
 
 import "Structs.wdl"
 import "TasksMakeCohortVcf.wdl" as MiniTasks
+import "HailMerge.wdl" as HailMerge
 import "Utils.wdl" as utils
 
 # Workflow to shard a filtered vcf & run vcfcluster (sub-sub-sub workflow)
@@ -20,6 +21,9 @@ workflow ShardedCluster {
     Int sv_size
     Array[String] sv_types
     Float merging_shard_scale_factor = 30000000
+
+    File hail_script
+    String project
 
     String sv_pipeline_docker
     String sv_base_mini_docker
@@ -125,21 +129,19 @@ workflow ShardedCluster {
     }
   }
   if (length(SvtkVcfCluster.out) > 0) {
-    call MiniTasks.ConcatVcfs {
+    call HailMerge.HailMerge as ConcatVcfs {
       input:
         vcfs=SortVcf.out,
-        vcfs_idx=SortVcf.out_index,
-        allow_overlaps=true,
-        outfile_prefix="~{prefix}.clustered",
-        sv_base_mini_docker=sv_base_mini_docker,
-        runtime_attr_override=runtime_override_concat_sharded_cluster
+        prefix="~{prefix}.clustered",
+        hail_script=hail_script,
+        project=project
     }
   }
 
   #Output
   output {
-    File clustered_vcf = select_first([GetVcfHeaderWithMembersInfoLine.out, ConcatVcfs.concat_vcf])
-    File clustered_vcf_idx = select_first([GetVcfHeaderWithMembersInfoLine.out_idx, ConcatVcfs.concat_vcf_idx])
+    File clustered_vcf = select_first([GetVcfHeaderWithMembersInfoLine.out, ConcatVcfs.merged_vcf])
+    File clustered_vcf_idx = select_first([GetVcfHeaderWithMembersInfoLine.out_idx, ConcatVcfs.merged_vcf_index])
   }
 }
 

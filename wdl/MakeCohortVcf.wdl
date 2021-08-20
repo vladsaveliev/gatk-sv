@@ -29,6 +29,9 @@ workflow MakeCohortVcf {
     Array[File] median_coverage_files
     Array[File] rf_cutoff_files
 
+    File hail_script
+    String project
+
     File bin_exclude
     File contig_list
     File allosome_fai
@@ -202,6 +205,8 @@ workflow MakeCohortVcf {
       depth_exclude_list=depth_exclude_list,
       min_sr_background_fail_batches=min_sr_background_fail_batches,
       empty_file=empty_file,
+      hail_script=hail_script,
+      project=project,
       sv_base_mini_docker=sv_base_mini_docker,
       sv_pipeline_docker=sv_pipeline_docker,
       runtime_override_update_sr_list=runtime_override_update_sr_list_cluster,
@@ -236,6 +241,8 @@ workflow MakeCohortVcf {
       mei_bed=mei_bed,
       pe_exclude_list=pe_exclude_list,
       ref_dict=ref_dict,
+      hail_script=hail_script,
+      project=project,
       max_shard_size=max_shard_size_resolve,
       sv_base_mini_docker=sv_base_mini_docker,
       sv_pipeline_docker=sv_pipeline_docker,
