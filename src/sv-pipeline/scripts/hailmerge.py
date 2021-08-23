@@ -65,7 +65,7 @@ lengths = {
     "chrY": 57227415
 }
 
-ref = hl.ReferenceGenome(name="hg38", contigs=contigs, lengths=lengths, X="chrX", Y="chrY")
+ref = hl.ReferenceGenome(name="hg38", contigs=contigs, lengths=lengths, x_contigs="chrX", y_contigs="chrY")
 all_datasets = [hl.import_vcf(f, reference_genome=ref, force_bgz=True) for f in files]
 
 mt = hl.MatrixTable.union_rows(*all_datasets)
