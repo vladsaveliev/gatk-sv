@@ -144,7 +144,8 @@ workflow ResolveComplexSv {
         vcfs=RestoreUnresolvedCnvPerShard.res,
         prefix="~{prefix}.resolved",
         hail_script=hail_script,
-        project=project
+        project=project,
+        sv_base_mini_docker=sv_base_mini_docker
     }
   }
 

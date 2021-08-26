@@ -2,7 +2,6 @@ version 1.0
 
 import "ResolveCpxSv.wdl" as ResolveComplexContig
 import "TasksMakeCohortVcf.wdl" as MiniTasks
-import "HailMerge.wdl" as HailMerge
 
 workflow ResolveComplexVariants {
   input {

@@ -134,7 +134,8 @@ workflow ShardedCluster {
         vcfs=SortVcf.out,
         prefix="~{prefix}.clustered",
         hail_script=hail_script,
-        project=project
+        project=project,
+        sv_base_mini_docker=sv_base_mini_docker
     }
   }
 

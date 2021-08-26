@@ -96,7 +96,8 @@ workflow ClusterSingleChrom {
       vcfs=RenameVariants.out,
       prefix="~{prefix}.~{contig}.concat_svtypes",
       hail_script=hail_script,
-      project=project
+      project=project,
+      sv_base_mini_docker=sv_base_mini_docker
   }
 
   #Output clustered vcf
