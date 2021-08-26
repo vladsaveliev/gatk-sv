@@ -28,8 +28,8 @@ workflow HailMerge {
   }
 
   output {
-    File merged_vcf = HailMerge.merged_vcf
-    File merged_vcf_index = HailMerge.merged_vcf_index
+    File merged_vcf = FixHeader.out
+    File merged_vcf_index = FixHeader.out_index
   }
 }
 
