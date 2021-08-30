@@ -265,8 +265,8 @@ task IntegrateResolvedVcfs {
     zcat ~{inv_res_vcf} \
       | fgrep -v "#" \
       |awk '{if ($8!~"UNRESOLVED") print}' \
-      |awk -F'\t' -v OFS='\t' 'ARGIND==1{inFileA[$4]; next} {if (!($3 in inFileA)) print }' all.resolved.inv.bed - \
-      |tr ',' '\n') \
+      |awk -F'\t' -v OFS='\t' 'ARGIND==1{inFileA[$4]; next} {if (!($3 in inFileA)) print }' \
+        <(awk '{if ($NF!="MEMBERS") print $NF}' all.resolved.inv.bed - | tr ',' '\n') \
       >add.vcf.lines.txt || true
 
     ##get unresolved variants id from full vcf to strip since they are resolved in inversion resolved vcf###
