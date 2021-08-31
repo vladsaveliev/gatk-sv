@@ -263,11 +263,11 @@ task IntegrateResolvedVcfs {
 
     ##get unresolved variants from full vcf that are resolved in inversion resolved vcf###
     zcat ~{inv_res_vcf} \
-      | fgrep -v "#" \
+      |fgrep -v "#" \
       |awk '{if ($8!~"UNRESOLVED") print}' \
       |awk -F'\t' -v OFS='\t' 'ARGIND==1{inFileA[$1]; next} {if (!($3 in inFileA)) print }' \
-        <(awk '{if ($NF!="MEMBERS") print $NF}' all.resolved.inv.bed - | tr ',' '\n') - \
-      >add.vcf.lines.txt || true
+        <(awk '{if ($NF!="MEMBERS") print $NF}' all.resolved.inv.bed | tr ',' '\n') - \
+      >add.vcf.lines.txt
 
     ##get unresolved variants id from full vcf to strip since they are resolved in inversion resolved vcf###
     ##inversions that cluster were other variants (rare) are kept as unresolved though they will also be part of a resolved variant in add.vcf.lines.txt##
@@ -275,7 +275,7 @@ task IntegrateResolvedVcfs {
       |tr ',' '\n'\
       |awk -F'\t' -v OFS='\t' 'ARGIND==1{inFileA[$4]; next} {if ($4 in inFileA) print }' all.resolved.inv.bed - \
       |awk '{if ($NF!~",")print $4}' \
-      >remove.unresolved.vcf.ids.txt || true
+      >remove.unresolved.vcf.ids.txt
 
     mkdir temp
     zcat ~{all_res_vcf} \
