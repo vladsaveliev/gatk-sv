@@ -26,14 +26,12 @@ workflow ClusterSingleChrom {
     String sv_pipeline_docker
     String sv_base_mini_docker
 
-    # overrides for local tasks
-    RuntimeAttr? runtime_override_concat_svtypes
-
     # overrides for MiniTasks
     RuntimeAttr? runtime_override_subset_sv_type
 
     # overrides for ShardedCluster
-    RuntimeAttr? runtime_override_shard_vcf_precluster
+    RuntimeAttr? runtime_override_shard_clusters
+    RuntimeAttr? runtime_override_shard_vids
     RuntimeAttr? runtime_override_pull_vcf_shard
     RuntimeAttr? runtime_override_svtk_vcf_cluster
     RuntimeAttr? runtime_override_get_vcf_header_with_members_info_line
@@ -73,7 +71,8 @@ workflow ClusterSingleChrom {
         project=project,
         sv_pipeline_docker=sv_pipeline_docker,
         sv_base_mini_docker=sv_base_mini_docker,
-        runtime_override_shard_vcf_precluster=runtime_override_shard_vcf_precluster,
+        runtime_override_shard_clusters=runtime_override_shard_clusters,
+        runtime_override_shard_vids=runtime_override_shard_vids,
         runtime_override_pull_vcf_shard=runtime_override_pull_vcf_shard,
         runtime_override_svtk_vcf_cluster=runtime_override_svtk_vcf_cluster,
         runtime_override_get_vcf_header_with_members_info_line=runtime_override_get_vcf_header_with_members_info_line,

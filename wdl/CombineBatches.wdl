@@ -51,7 +51,8 @@ workflow CombineBatches {
     RuntimeAttr? runtime_override_subset_bothside_pass
     RuntimeAttr? runtime_override_subset_background_fail
     RuntimeAttr? runtime_override_subset_sv_type
-    RuntimeAttr? runtime_override_shard_vcf_precluster
+    RuntimeAttr? runtime_override_shard_clusters
+    RuntimeAttr? runtime_override_shard_vids
     RuntimeAttr? runtime_override_pull_vcf_shard
     RuntimeAttr? runtime_override_svtk_vcf_cluster
     RuntimeAttr? runtime_override_get_vcf_header_with_members_info_line
@@ -116,7 +117,8 @@ workflow CombineBatches {
         runtime_override_subset_bothside_pass=runtime_override_subset_bothside_pass,
         runtime_override_subset_background_fail=runtime_override_subset_background_fail,
         runtime_override_subset_sv_type=runtime_override_subset_sv_type,
-        runtime_override_shard_vcf_precluster=runtime_override_shard_vcf_precluster,
+        runtime_override_shard_clusters=runtime_override_shard_clusters,
+        runtime_override_shard_vids=runtime_override_shard_vids,
         runtime_override_pull_vcf_shard=runtime_override_pull_vcf_shard,
         runtime_override_svtk_vcf_cluster=runtime_override_svtk_vcf_cluster,
         runtime_override_get_vcf_header_with_members_info_line=runtime_override_get_vcf_header_with_members_info_line,
@@ -154,7 +156,8 @@ workflow CombineBatches {
         runtime_override_subset_bothside_pass=runtime_override_subset_bothside_pass,
         runtime_override_subset_background_fail=runtime_override_subset_background_fail,
         runtime_override_subset_sv_type=runtime_override_subset_sv_type,
-        runtime_override_shard_vcf_precluster=runtime_override_shard_vcf_precluster,
+        runtime_override_shard_clusters=runtime_override_shard_clusters,
+        runtime_override_shard_vids=runtime_override_shard_vids,
         runtime_override_svtk_vcf_cluster=runtime_override_svtk_vcf_cluster,
         runtime_override_get_vcf_header_with_members_info_line=runtime_override_get_vcf_header_with_members_info_line,
         runtime_override_concat_vcf_cluster=runtime_override_concat_vcf_cluster,

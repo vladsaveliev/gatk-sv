@@ -32,7 +32,8 @@ workflow ShardedCluster {
     File? NONE_FILE_
 
     # overrides for local tasks
-    RuntimeAttr? runtime_override_shard_vcf_precluster
+    RuntimeAttr? runtime_override_shard_clusters
+    RuntimeAttr? runtime_override_shard_vids
     RuntimeAttr? runtime_override_pull_vcf_shard
     RuntimeAttr? runtime_override_svtk_vcf_cluster
     RuntimeAttr? runtime_override_get_vcf_header_with_members_info_line
@@ -71,7 +72,7 @@ workflow ShardedCluster {
       svsize=sv_size,
       sv_types=sv_types,
       sv_pipeline_docker=sv_pipeline_docker,
-      runtime_attr_override=runtime_override_svtk_vcf_cluster
+      runtime_attr_override=runtime_override_shard_clusters
   }
 
   call MiniTasks.ShardVids {
@@ -80,7 +81,7 @@ workflow ShardedCluster {
       prefix=prefix,
       records_per_shard=merge_shard_size,
       sv_pipeline_docker=sv_pipeline_docker,
-      runtime_attr_override=runtime_override_svtk_vcf_cluster
+      runtime_attr_override=runtime_override_shard_vids
   }
 
   #Run vcfcluster per shard
