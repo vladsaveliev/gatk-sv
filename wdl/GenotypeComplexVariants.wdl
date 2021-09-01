@@ -25,6 +25,9 @@ workflow GenotypeComplexVariants {
     File contig_list
     File ref_dict
 
+    File hail_script
+    String project
+
     String linux_docker
     String sv_base_mini_docker
     String sv_pipeline_docker
@@ -88,6 +91,8 @@ workflow GenotypeComplexVariants {
         contig=contig,
         ped_files=SubsetPedFile.ped_subset_file,
         ref_dict=ref_dict,
+        hail_script=hail_script,
+        project=project,
         linux_docker=linux_docker,
         sv_base_mini_docker=sv_base_mini_docker,
         sv_pipeline_docker=sv_pipeline_docker,

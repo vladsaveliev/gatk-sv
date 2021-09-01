@@ -4,6 +4,7 @@ version 1.0
 
 import "GenotypeCpxCnvs.wdl" as GenotypeCpx
 import "TasksMakeCohortVcf.wdl" as MiniTasks
+import "HailMerge.wdl" as HailMerge
 
 # Workflow to perform depth-based genotyping for a single vcf shard scattered 
 # across batches on predicted CPX CNVs
@@ -25,6 +26,9 @@ workflow ScatterCpxGenotyping {
     File merged_ped_file
     String contig
     File ref_dict
+
+    File hail_script
+    String project
 
     String linux_docker
     String sv_base_mini_docker
@@ -92,20 +96,18 @@ workflow ScatterCpxGenotyping {
     }
   }
 
-  # Merge VCF shards
-  call MiniTasks.ConcatVcfs as ConcatCpxCnvVcfs {
+  call HailMerge.HailMerge as ConcatCpxCnvVcfs {
     input:
       vcfs=GenotypeShard.cpx_depth_gt_resolved_vcf,
-      vcfs_idx=GenotypeShard.cpx_depth_gt_resolved_vcf_idx,
-      allow_overlaps=true,
-      outfile_prefix=contig_prefix + ".regenotyped",
-      sv_base_mini_docker=sv_base_mini_docker,
-      runtime_attr_override=runtime_override_concat_cpx_cnv_vcfs
+      prefix="~{prefix}.regenotyped",
+      hail_script=hail_script,
+      project=project,
+      sv_base_mini_docker=sv_base_mini_docker
   }
 
   # Output merged VCF
   output {
-    File cpx_depth_gt_resolved_vcf = ConcatCpxCnvVcfs.concat_vcf
-    File cpx_depth_gt_resolved_vcf_idx = ConcatCpxCnvVcfs.concat_vcf_idx
+    File cpx_depth_gt_resolved_vcf = ConcatCpxCnvVcfs.merged_vcf
+    File cpx_depth_gt_resolved_vcf_idx = ConcatCpxCnvVcfs.merged_vcf_index
   }
  }
