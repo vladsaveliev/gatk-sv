@@ -64,7 +64,7 @@ from google.cloud import dataproc_v1 as dataproc
 cluster_name = "gatk-sv-hail-{}".format(uuid.uuid4())
 
 try:
-  print(os.popen("hailctl dataproc start --region {} --project {} --num-master-local-ssds 1 --num-worker-local-ssds 1 --max-idle=60m --max-age=120m {}".format("~{region}", "~{project}", cluster_name)).read())
+  print(os.popen("hailctl dataproc start --num-workers 8 --region {} --project {} --num-master-local-ssds 1 --num-worker-local-ssds 1 --max-idle=60m --max-age=1440m {}".format("~{region}", "~{project}", cluster_name)).read())
 
   cluster_client = dataproc.ClusterControllerClient(
         client_options={"api_endpoint": f"~{region}-dataproc.googleapis.com:443"}
