@@ -6,6 +6,7 @@ import "CleanVcf1.wdl" as c1
 import "CleanVcf1b.wdl" as c1b
 import "CleanVcf5.wdl" as c5
 import "DropRedundantCNVs.wdl" as drc
+import "HailMerge.wdl" as HailMerge
 
 workflow CleanVcfChromosome {
   input {
@@ -20,6 +21,9 @@ workflow CleanVcfChromosome {
     Int min_records_per_shard_step1
     Int samples_per_step2_shard
     File? outlier_samples_list
+
+    File hail_script
+    String project
 
     String linux_docker
     String sv_base_mini_docker
@@ -70,15 +74,13 @@ workflow CleanVcfChromosome {
     }
   }
 
-  call MiniTasks.ConcatVcfs as CombineStep1Vcfs {
+  call HailMerge.HailMerge as CombineStep1Vcfs {
     input:
       vcfs=CleanVcf1a.intermediate_vcf,
-      vcfs_idx=CleanVcf1a.intermediate_vcf_idx,
-      naive=true,
-      generate_index=false,
-      outfile_prefix=prefix + ".cleanVCF_step1.intermediate_vcf.merged",
-      sv_base_mini_docker=sv_base_mini_docker,
-      runtime_attr_override=runtime_override_combine_step_1_vcfs
+      prefix="~{prefix}.cleanVCF_step1.intermediate_vcf.merged",
+      hail_script=hail_script,
+      project=project,
+      sv_base_mini_docker=sv_base_mini_docker
   }
 
   call MiniTasks.CatUncompressedFiles as CombineStep1SexChrRevisions {
@@ -91,7 +93,7 @@ workflow CleanVcfChromosome {
 
   call c1b.CleanVcf1b {
     input:
-      intermediate_vcf=CombineStep1Vcfs.concat_vcf,
+      intermediate_vcf=CombineStep1Vcfs.merged_vcf,
       sv_pipeline_docker=sv_pipeline_docker,
       runtime_attr_override=runtime_override_clean_vcf_1b
   }

@@ -319,6 +319,8 @@ workflow MakeCohortVcf {
       min_records_per_shard_clean_vcf_step1=min_records_per_shard_clean_vcf_step1,
       samples_per_clean_vcf_step2_shard=samples_per_clean_vcf_step2_shard,
       outlier_samples_list=outlier_samples_list,
+      hail_script=hail_script,
+      project=project,
       linux_docker=linux_docker,
       sv_base_mini_docker=sv_base_mini_docker,
       sv_pipeline_docker=sv_pipeline_docker,
