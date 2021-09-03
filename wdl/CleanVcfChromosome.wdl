@@ -496,13 +496,26 @@ task CleanVcf5 {
 
     ~{if defined(outlier_samples_list) then "ln ~{outlier_samples_list} outliers.txt" else "touch outliers.txt"}
 
-    /opt/sv-pipeline/04_variant_resolution/scripts/clean_vcf_part5.sh \
-      ~{revise_vcf_lines} \
+    # put the revise lines into a normal VCF format
+    bcftools view -h ~{normal_revise_vcf} > header.txt
+    cat header.txt <(zcat ~{revise_vcf_lines} | grep . | tr " " "\t") | bgzip -c > revise.vcf.lines.vcf.gz
+
+    /opt/sv-pipeline/04_variant_resolution/scripts/clean_vcf_part5_new.py \
+      revise.vcf.lines.vcf.gz \
       ~{normal_revise_vcf} \
       ~{ped_file} \
       ~{sex_chr_revise} \
       ~{multi_ids} \
-      outliers.txt
+      outliers.txt \
+      polished.need_reheader.vcf.gz
+
+    # do the last bit of header cleanup
+    bcftools view -h polished.need_reheader.vcf.gz | head -1 > new_header.vcf
+    bcftools view -h polished.need_reheader.vcf.gz \
+      | awk 'NR > 1' \
+      | egrep -v "CIPOS|CIEND|RMSSTD|EVENT|INFO=<ID=UNRESOLVED,|source|varGQ|bcftools|ALT=<ID=UNR|INFO=<ID=MULTIALLELIC," \
+      | sort -k1,1 >> new_header.vcf
+    bcftools reheader polished.need_reheader.vcf.gz -h new_header.vcf -o polished.vcf.gz
   >>>
 
   output {
