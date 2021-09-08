@@ -262,6 +262,53 @@ workflow CombineBatches {
   }
 }
 
+task MergePesrDepth {
+  input {
+    File vcf
+    File vcf_index
+    String prefix
+    String contig
+    String sv_pipeline_docker
+    RuntimeAttr? runtime_attr_override
+  }
+
+  String output_file = prefix + ".vcf.gz"
+
+  # when filtering/sorting/etc, memory usage will likely go up (much of the data will have to
+  # be held in memory or disk while working, potentially in a form that takes up more space)
+  Float input_size = size(vcf, "GiB")
+  RuntimeAttr runtime_default = object {
+                                  mem_gb: 2.0 + 0.6 * input_size,
+                                  disk_gb: ceil(10.0 + 4 * input_size),
+                                  cpu_cores: 1,
+                                  preemptible_tries: 3,
+                                  max_retries: 1,
+                                  boot_disk_gb: 10
+                                }
+  RuntimeAttr runtime_override = select_first([runtime_attr_override, runtime_default])
+  runtime {
+    memory: "~{select_first([runtime_override.mem_gb, runtime_default.mem_gb])} GiB"
+    disks: "local-disk ~{select_first([runtime_override.disk_gb, runtime_default.disk_gb])} HDD"
+    cpu: select_first([runtime_override.cpu_cores, runtime_default.cpu_cores])
+    preemptible: select_first([runtime_override.preemptible_tries, runtime_default.preemptible_tries])
+    maxRetries: select_first([runtime_override.max_retries, runtime_default.max_retries])
+    docker: sv_pipeline_docker
+    bootDiskSizeGb: select_first([runtime_override.boot_disk_gb, runtime_default.boot_disk_gb])
+  }
+
+  command <<<
+    set -euo pipefail
+    /opt/sv-pipeline/04_variant_resolution/scripts/merge_pesr_depth.py \
+    --prefix pesr_depth_merged_~{contig} \
+    ~{vcf} \
+    ~{output_file}
+  >>>
+
+  output {
+    File merged_vcf = output_file
+  }
+}
+
 task HarmonizeHeader {
   input {
     File vcf
