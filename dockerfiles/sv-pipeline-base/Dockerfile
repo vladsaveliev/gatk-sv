@@ -64,7 +64,7 @@ ARG CONDA_DEP_TRANSIENT="make git wget"
 ARG CONDA_DEP="software-properties-common zlib1g-dev libbz2-dev liblzma-dev libcurl4-openssl-dev libssl-dev libblas-dev liblapack-dev libatlas-base-dev g++ gfortran ${CONDA_DEP_TRANSIENT}"
 # versions of bedtools > 2.27.0 seem to have lost the ability to read gzipped files
 # pandas 1.0.0 causes problem with bedtools in aggregate.py
-ARG PYTHON_PKGS="wheel=0.34.2 bzip2=1.0.8 cython=0.29.14 numpy=1.18.1 pandas=0.25.3 scikit-learn=0.22.1 scipy=1.4.1 intervaltree=3.0.2 matplotlib=3.1.3 natsort=7.0.1 bedtools=2.27.0 pybedtools=0.8.1 pysam=0.14.1=py36_htslib1.7_0"
+ARG PYTHON_PKGS="wheel=0.34.2 bzip2=1.0.8 cython=0.29.14 numpy=1.18.1 pandas=0.25.3 scikit-learn=0.22.1 scipy=1.4.1 intervaltree=3.0.2 matplotlib=3.1.3 natsort=7.0.1 bedtools=2.27.0 pybedtools=0.8.1 pysam=0.14.1=py36_htslib1.7_0 cyvcf2=0.30.11"
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
 ARG CONDA_INSTALL_DIR="/opt/conda"
@@ -90,10 +90,7 @@ RUN apt-get -qqy update --fix-missing && \
     git clone https://github.com/pysam-developers/pysam.git /opt/pysam && \
     cd /opt/pysam && \
     git checkout af6ff23322af451b8ab6ea78b53676c45ae0a779 && \
-    pip install -e . && \
-    git clone https://github.com/brentp/cyvcf2.git /opt/cyvcf2 && \
-    cd /opt/cyvcf2 && \
-    git checkout v0.30.11 && \
+    sed -i "s/'use_2to3': True,/'use_2to3': False,/g" setup.py && \
     pip install -e . && \
     rm -rf ${HOME}/.cache/pip && \
     conda clean -tipsy && \
